@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(NeuroVMKR VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTORCC ON)
 
 # Подключаем Qt6 Quick и QuickControls2
 find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2)
@@ -10,6 +11,7 @@ find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2)
 qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(appNeuroVMKR
+    icons.qrc
     main.cpp
 )
 
@@ -20,10 +22,9 @@ qt_add_qml_module(appNeuroVMKR
         Main.qml
         FileLoadPage.qml
         FileMovePage.qml
+        components/FileDragDrop.qml
     RESOURCES
-        images/upload.svg
-        images/folder.svg
-        images/clapperboard.svg
+    icons.qrc
 )
 
 set_target_properties(appNeuroVMKR PROPERTIES

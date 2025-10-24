@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/clapperboard.svg</file>
+        <file>images/upload.svg</file>
+        <file>images/folder.svg</file>
+    </qresource>
+</RCC>
