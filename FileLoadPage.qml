@@ -2,37 +2,39 @@ import QtQuick
 import QtQuick.Controls 2.12
 
 Page {
-    title: "Страница 1"
-    Rectangle {
-            anchors.fill: parent
-            color: "#f0f0f0"
+    background: Rectangle {
+        anchors.fill: parent
+        color: palette.window
+    }
 
-            Rectangle {
-                id: dropZone
-                width: 300
-                height: 100
+    Column {
+        anchors.fill: parent
+
+        Rectangle {
+            anchors.centerIn: parent
+            width: parent.width / 2
+            height: 200
+            border.width: 1.5
+            border.color: "gray"
+            radius: 16
+
+            Column {
                 anchors.centerIn: parent
-                color: dropArea.containsDrag ? "#a0ffa0" : "#ffffff"
-                border.color: "#000000"
-                border.width: 2
-                radius: 5
+                spacing: 4
 
-                Text {
-                    anchors.centerIn: parent
-                    text: "Перетащите сюда файл"
-                    font.pointSize: 14
+                Image {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    source: "images/folder.svg"
+                    fillMode: Image.PreserveAspectFit
+                    sourceSize.width: 64
+                    sourceSize.height: 64
                 }
-
-                DropArea {
-                    id: dropArea
-                    anchors.fill: parent
-
-                    onDropped: {
-                        for (var i = 0; i < drop.proposedUrls.length; i++) {
-                            console.log("Файл:", drop.proposedUrls[i])
-                        }
-                    }
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Перетащите в область файлы или папку"
+                    color: palette.text
                 }
             }
         }
+    }
 }

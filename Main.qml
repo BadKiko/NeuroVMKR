@@ -1,20 +1,21 @@
-import QtQuick
-import QtQuick.Controls 2.12
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 
 ApplicationWindow {
     width: 640
     height: 480
     visible: true
-
-    Loader {
-            id: windowLoader
-            anchors.fill: parent
-            active: false // Start with no window loaded
-        }
+    title: "NeuroVMKR"
 
     StackView {
         id: stack
         anchors.fill: parent
-        initialItem: FileLoadPage {}  // Страница загрузки файлов
+        initialItem: FileLoadPage {}
     }
+
+
+    // Настройка базовой палитры
+    palette.window: "white"
+    palette.button: "lightgray"
+    palette.text: "red"
 }
