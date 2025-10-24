@@ -1,6 +1,7 @@
 import QtQuick
-import QtQuick.Controls 2.12
+import QtQuick.Controls
 import QtQuick.Effects
+import Qt.labs.folderlistmodel
 
 Page {
     background: Rectangle {
@@ -21,6 +22,7 @@ Page {
         }
 
         Rectangle {
+            id: container
             anchors.centerIn: parent
             width: parent.width / 2
             height: 200
@@ -49,31 +51,46 @@ Page {
                 }
 
                 Text {
+                    id: droparea_text
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "Перетащите в область файлы или папку"
                     color: palette.text
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                    width: container.width
                 }
             }
 
             DropArea {
+                id: droparea
                 anchors.fill: parent
                 property var videoFiles: []
 
-                ListModel {
+                FolderListModel {
                     id: folderModel
                     nameFilters: ["*.mp4", "*.mov"]
                     showDirs: false
                 }
 
+                onEntered: {
+                    console.log("Drag entered drop area!")
+                    droparea_icon.source = "images/upload.svg"
+                    parent.border.color = palette.accent
+                }
+                onExited: {
+                    console.log("Drag exited drop area!")
+                    droparea_icon.source = "images/folder.svg"
+                    parent.border.color = palette.mid
+                }
                 onDropped: drop => {
-                               drop.acceptProposedAction()
+                               droparea_icon.source = "images/folder.svg"
+                               parent.border.color = palette.mid
                                videoFiles = []
 
                                for (let url of drop.urls) {
                                    const path = normalizePath(url)
-                                   const info = FileInfo(path)
 
-                                   if (info.isDir) {
+                                   if (isDirectory(path)) {
                                        folderModel.folder = "file://" + path
                                        for (var i = 0; i < folderModel.count; i++) {
                                            videoFiles.push(folderModel.get(
@@ -83,17 +100,34 @@ Page {
                                        videoFiles.push(path)
                                    }
                                }
-
-                               console.log("Найдено видеофайлов:",
-                                           videoFiles.length)
+                               if (videoFiles.length > 0) {
+                                   droparea_text.text = `Загружено ${videoFiles.length} файл(ов)`
+                                   droparea_icon.source = "images/clapperboard.svg"
+                               } else {
+                                   droparea_text.text = `Перетащите в область файлы или папку`
+                                   droparea_icon.source = "images/folder.svg"
+                               }
                            }
 
                 function normalizePath(url) {
                     return url.toString().replace("file://", "")
                 }
                 function isVideoFile(path) {
-                    return path.endsWith(".mp4") || path.endsWith(".mov")
+                    return path.toLowerCase().endsWith(".mp4")
+                            || path.toLowerCase().endsWith(".mov")
                 }
+
+                function isDirectory(path) {
+                    return !path.includes(".") || path.endsWith("/")
+                }
+            }
+        }
+
+        Button {
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: droparea.width
+            Text {
+                text: "Продолжить"
             }
         }
     }
