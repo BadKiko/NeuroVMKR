@@ -22,6 +22,10 @@ ApplicationWindow {
         navStack.pop()
     }
 
+    // Делаем функции доступными как свойства для всех дочерних компонентов
+    property var navigatePushPage: pushPage
+    property var navigatePopPage: popPage
+
     StackView {
         id: navStack
         objectName: "navStack"

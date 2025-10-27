@@ -6,23 +6,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
 # Подключаем Qt6 Quick и QuickControls2
-find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2 Multimedia)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(appNeuroVMKR
     icons.qrc
-    main.cpp
+    src/main.cpp
 )
 
 qt_add_qml_module(appNeuroVMKR
     URI NeuroVMKR
     VERSION 1.0
     QML_FILES
-        Main.qml
-        FileLoadPage.qml
-        FileMovePage.qml
-        components/FileDragDrop.qml
+        qml/Main.qml
+        qml/FileLoadPage.qml
+        qml/FileMovePage.qml
+        qml/components/FileDragDrop.qml
+        qml/components/VideoThumbnail.qml
     RESOURCES
     icons.qrc
 )
@@ -34,9 +35,9 @@ set_target_properties(appNeuroVMKR PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-# Линкуем с Qt Quick и Qt QuickControls2
+# Линкуем
 target_link_libraries(appNeuroVMKR
-    PRIVATE Qt6::Quick Qt6::QuickControls2
+    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Multimedia
 )
 
 include(GNUInstallDirs)

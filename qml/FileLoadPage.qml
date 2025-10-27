@@ -57,7 +57,8 @@ Page {
             width: parent.width
             text: "Продолжить"
             onClicked: mainWindow.pushPage("FileMovePage.qml", {
-                                               "videoFiles": column.selectedVideoFiles
+                                               "videoFiles": column.selectedVideoFiles,
+                                               "navigationFunctions": mainWindow
                                            })
         }
     }
