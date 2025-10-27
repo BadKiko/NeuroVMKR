@@ -2,13 +2,29 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 ApplicationWindow {
+    id: mainWindow
+    objectName: "mainWindow"
     width: 640
     height: 480
     visible: true
     title: "NeuroVMKR"
 
+    // Функции навигации (доступны глобально для всех компонентов)
+    function pushPage(page, properties) {
+        if (properties) {
+            navStack.push(page, properties)
+        } else {
+            navStack.push(page)
+        }
+    }
+
+    function popPage() {
+        navStack.pop()
+    }
+
     StackView {
         id: navStack
+        objectName: "navStack"
         anchors.fill: parent
         initialItem: FileLoadPage {}
     }

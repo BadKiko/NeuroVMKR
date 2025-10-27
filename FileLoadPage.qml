@@ -56,7 +56,9 @@ Page {
             visible: column.selectedVideoFiles.length > 0
             width: parent.width
             text: "Продолжить"
-            onClicked: navStack.push("FileMovePage.qml")
+            onClicked: mainWindow.pushPage("FileMovePage.qml", {
+                                               "videoFiles": column.selectedVideoFiles
+                                           })
         }
     }
 }
