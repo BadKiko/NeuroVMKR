@@ -3,34 +3,29 @@ import QtQuick.Controls 2.15
 
 ApplicationWindow {
     id: mainWindow
-    objectName: "mainWindow"
     width: 640
     height: 480
     visible: true
     title: "NeuroVMKR"
 
-    // Функции навигации (доступны глобально для всех компонентов)
-    function pushPage(page, properties) {
-        if (properties) {
-            navStack.push(page, properties)
-        } else {
-            navStack.push(page)
+    // Навигация
+    StackView {
+        id: navStack
+        anchors.fill: parent
+        initialItem: FileLoadPage {
+            navigationFunctions: mainWindow // передаем объект с функциями навигации
         }
     }
 
+    // Навигационные функции
+    function pushPage(page, properties) {
+        if (properties)
+            navStack.push(page, properties)
+        else
+            navStack.push(page)
+    }
     function popPage() {
         navStack.pop()
-    }
-
-    // Делаем функции доступными как свойства для всех дочерних компонентов
-    property var navigatePushPage: pushPage
-    property var navigatePopPage: popPage
-
-    StackView {
-        id: navStack
-        objectName: "navStack"
-        anchors.fill: parent
-        initialItem: FileLoadPage {}
     }
 
     // Настройка черно-белой-серой темы

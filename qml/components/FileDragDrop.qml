@@ -95,10 +95,10 @@ Rectangle {
                            if (isDirectory(path)) {
                                folderModel.folder = "file://" + path
                                for (var i = 0; i < folderModel.count; i++) {
-                                   newFiles.push(folderModel.get(i, "filePath"))
+                                   newFiles.push("file://" + folderModel.get(i, "filePath"))
                                }
                            } else if (isVideoFile(path)) {
-                               newFiles.push(path)
+                               newFiles.push("file://" + path)
                            }
                        }
 

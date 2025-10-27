@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Controls
 
 Page {
-
+    id: root
+    property var navigationFunctions: Main
     background: Rectangle {
         id: page
         anchors.fill: parent
@@ -56,10 +57,10 @@ Page {
             visible: column.selectedVideoFiles.length > 0
             width: parent.width
             text: "Продолжить"
-            onClicked: mainWindow.pushPage("FileMovePage.qml", {
-                                               "videoFiles": column.selectedVideoFiles,
-                                               "navigationFunctions": mainWindow
-                                           })
+            onClicked: root.navigationFunctions.pushPage("FileMovePage.qml", {
+                                                             "videoFiles": column.selectedVideoFiles,
+                                                             "navigationFunctions": root.navigationFunctions
+                                                         })
         }
     }
 }

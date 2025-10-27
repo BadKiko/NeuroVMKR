@@ -1,23 +1,18 @@
 import QtQuick
-import QtQuick.Controls
 import QtMultimedia
 
 // Простой компонент для создания миниатюр видео
 Item {
     id: root
     property string source: ""
-    property int thumbnailWidth: 160
-    property int thumbnailHeight: 120
 
     // Сигнал испускается когда миниатюра готова
     signal thumbnailReady(var thumbnailImage)
 
-    width: thumbnailWidth
-    height: thumbnailHeight
-
     // Видео для создания миниатюры
     Video {
         id: videoPlayer
+        anchors.fill: parent
         source: root.source
         autoPlay: false
         visible: false // Не показываем видео, только используем для кадра
@@ -34,12 +29,20 @@ Item {
         // Обработка ошибок
         onErrorOccurred: {
             console.log("Video error:", errorString)
+            console.log("Video source:", source)
+            console.log("Error code:", error)
         }
     }
 
     // Функция для создания миниатюры
     function createThumbnail() {
         if (root.source) {
+            console.log("Creating thumbnail for:", root.source)
+            // Убеждаемся что путь является правильным URL
+            if (!root.source.startsWith("file://") && !root.source.startsWith("http")) {
+                console.warn("Invalid video source format:", root.source)
+                return
+            }
             videoPlayer.play()
         }
     }

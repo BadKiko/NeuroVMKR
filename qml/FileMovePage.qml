@@ -1,13 +1,12 @@
-pragma ComponentBehavior: Bound
-
 import QtQuick
 import QtQuick.Controls
 import QtMultimedia
+import "components"
 
 Page {
     id: root
+    property var navigationFunctions
     property var videoFiles: []
-    property var navigationFunctions: null
 
     background: Rectangle {
         anchors.fill: parent
@@ -42,57 +41,33 @@ Page {
             anchors.horizontalCenter: parent.horizontalCenter
             columns: 3
             spacing: 15
+
             Repeater {
                 model: root.videoFiles
-                delegate: Rectangle {
+
+                delegate: Item {
+                    id: cardRoot
                     width: 200
-                    height: 140
-                    border.width: 1.5
-                    border.color: palette.mid
-                    radius: 12
-                    color: palette.dark
+                    height: 125
 
-                    Column {
+                    Rectangle {
                         anchors.fill: parent
-                        anchors.margins: 8
-                        spacing: 6
+                        border.width: 1.5
+                        border.color: palette.mid
+                        radius: 16
+                        color: palette.dark
+                    }
 
-                        // Видео-превью
-                        Video {
-                            id: videoPreview
-                            width: parent.width - 16
-                            height: 100
-                            source: root.videoFiles[index]
-                            autoPlay: false
-                            loops: MediaPlayer.Infinite
+                    VideoThumbnail {
+                        anchors.centerIn: parent
+                        anchors.fill: parent
+                        source: modelData
+                    }
 
-                            Component.onCompleted: {
-                                if (root.videoFiles && root.videoFiles[index]) {
-                                    source = root.videoFiles[index]
-                                }
-                            }
-
-                            // Показываем первый кадр и останавливаемся
-                            onPlaying: {
-                                seek(0) // Переходим к началу
-                                pause() // Останавливаем на первом кадре
-                            }
-                        }
-
-                        // Имя файла
-                        Text {
-                            width: parent.width - 16
-                            text: {
-                                var filePath = root.videoFiles[index] || ""
-                                return filePath.split('/').pop()
-                            }
-                            color: palette.text
-                            font.pointSize: 10
-                            opacity: 0.8
-                            elide: Text.ElideMiddle
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
+                    Text {
+                        anchors.centerIn: parent
+                        color: "white"
+                        text: modelData
                     }
                 }
             }
