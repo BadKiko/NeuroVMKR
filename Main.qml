@@ -8,7 +8,7 @@ ApplicationWindow {
     title: "NeuroVMKR"
 
     StackView {
-        id: stack
+        id: navStack
         anchors.fill: parent
         initialItem: FileLoadPage {}
     }
