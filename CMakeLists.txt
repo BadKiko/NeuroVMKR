@@ -13,6 +13,7 @@ qt_standard_project_setup(REQUIRES 6.8)
 qt_add_executable(appNeuroVMKR
     icons.qrc
     src/main.cpp
+    src/videothumbnailprovider.cpp
 )
 
 qt_add_qml_module(appNeuroVMKR

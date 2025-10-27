@@ -1,56 +1,62 @@
 import QtQuick
-import QtMultimedia
 
-// Простой компонент для создания миниатюр видео
+// Простой компонент для создания миниатюр видео с использованием C++ провайдера
 Item {
     id: root
     property string source: ""
+    property int thumbnailWidth: 160
+    property int thumbnailHeight: 120
 
     // Сигнал испускается когда миниатюра готова
     signal thumbnailReady(var thumbnailImage)
 
-    // Видео для создания миниатюры
-    Video {
-        id: videoPlayer
+    width: thumbnailWidth
+    height: thumbnailHeight
+
+    // Изображение для отображения миниатюры
+    Image {
+        id: thumbnailImage
         anchors.fill: parent
-        source: root.source
-        autoPlay: false
-        visible: false // Не показываем видео, только используем для кадра
+        fillMode: Image.PreserveAspectFit
+        cache: false
 
-        // Когда видео готово к воспроизведению
-        onPlaying: {
-            // Захватываем первый кадр
-            grabToImage(function(result) {
-                root.thumbnailReady(result.image)
-                videoPlayer.stop()
-            })
-        }
+        // Используем C++ провайдер для получения миниатюры
+        source: root.source ? "image://videoThumbnail/" + encodeURIComponent(root.source) : ""
 
-        // Обработка ошибок
-        onErrorOccurred: {
-            console.log("Video error:", errorString)
-            console.log("Video source:", source)
-            console.log("Error code:", error)
+        onStatusChanged: {
+            if (status === Image.Ready) {
+                console.log("Thumbnail loaded successfully:", root.source)
+                root.thumbnailReady(thumbnailImage)
+            } else if (status === Image.Error) {
+                console.warn("Failed to load thumbnail for:", root.source)
+                // Показываем placeholder при ошибке
+                placeholder.visible = true
+            }
         }
     }
 
-    // Функция для создания миниатюры
-    function createThumbnail() {
-        if (root.source) {
-            console.log("Creating thumbnail for:", root.source)
-            // Убеждаемся что путь является правильным URL
-            if (!root.source.startsWith("file://") && !root.source.startsWith("http")) {
-                console.warn("Invalid video source format:", root.source)
-                return
-            }
-            videoPlayer.play()
+    // Placeholder для ошибок
+    Rectangle {
+        id: placeholder
+        anchors.fill: parent
+        color: "#333333"
+        visible: false
+
+        Text {
+            anchors.centerIn: parent
+            text: "📹"
+            font.pointSize: 24
+            color: "#666666"
         }
     }
 
     // Создаем миниатюру при изменении источника
     onSourceChanged: {
+        console.log("Video source changed to:", source)
+        placeholder.visible = false
         if (source) {
-            createThumbnail()
+            // Обновляем изображение, что вызовет запрос к провайдеру
+            thumbnailImage.source = "image://videoThumbnail/" + encodeURIComponent(source)
         }
     }
 }

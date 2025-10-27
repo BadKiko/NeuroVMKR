@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QtQuickControls2/QQuickStyle>
+#include "videothumbnailprovider.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,10 @@ int main(int argc, char *argv[])
     QQuickStyle::setStyle("Material");
 
     QQmlApplicationEngine engine;
+
+    // Регистрируем провайдер миниатюр видео
+    VideoThumbnailProvider *thumbnailProvider = new VideoThumbnailProvider();
+    engine.addImageProvider("videoThumbnail", thumbnailProvider);
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed,
                      &app, []() { QCoreApplication::exit(-1); },
                      Qt::QueuedConnection);
