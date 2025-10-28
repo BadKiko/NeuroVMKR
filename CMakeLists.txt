@@ -26,6 +26,7 @@ qt_add_qml_module(appNeuroVMKR
         qml/FileMovePage.qml
         qml/components/FileDragDrop.qml
         qml/components/VideoThumbnail.qml
+        qml/components/VideoDragNDropGrid.qml
     RESOURCES
     icons.qrc
 )
