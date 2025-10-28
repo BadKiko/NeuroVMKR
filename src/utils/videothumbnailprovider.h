@@ -1,10 +1,7 @@
-#ifndef VIDEOTHUMBNAILPROVIDER_H
-#define VIDEOTHUMBNAILPROVIDER_H
-
+#pragma once
 #include <QQuickImageProvider>
-#include <QObject>
-#include <QString>
 #include <QImage>
+#include <QString>
 
 class VideoThumbnailProvider : public QQuickImageProvider
 {
@@ -13,9 +10,6 @@ public:
     ~VideoThumbnailProvider();
 
     QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize) override;
-
 private:
-    QImage extractFrameFromVideo(const QString &videoPath, const QSize &requestedSize);
+    QImage roundImage(QImage frame, int roundPixels);
 };
-
-#endif // VIDEOTHUMBNAILPROVIDER_H

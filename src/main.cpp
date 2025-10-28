@@ -1,7 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QtQuickControls2/QQuickStyle>
-#include "videothumbnailprovider.h"
+#include "utils/videothumbnailprovider.h"
 
 int main(int argc, char *argv[])
 {

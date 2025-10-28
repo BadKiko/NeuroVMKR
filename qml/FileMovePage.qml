@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtMultimedia
 import "components"
 
 Page {
@@ -9,74 +8,178 @@ Page {
     property var videoFiles: []
 
     background: Rectangle {
+        id: page
         anchors.fill: parent
         color: palette.window
     }
 
     Column {
+        id: contentColumn
+        width: parent.width - 12
         anchors.centerIn: parent
         spacing: 20
-        width: Math.min(parent.width * 0.8, 500)
 
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: "Обработка файлов"
-            color: palette.text
-            font.pointSize: 18
+        Column {
+            width: parent.width
+            spacing: 8
+            Text {
+                id: titleText
+                text: "Видео успешно загружены"
+                color: palette.text
+                font.pointSize: 14
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            Text {
+                id: hintText
+                text: "Перетащите видео в том порядке, в котором хотите, чтобы нейросеть создала контекст истории, или включите авто — нейросеть сама попробует построить логическую последовательность."
+                color: palette.text
+                font.pointSize: 10
+                opacity: 0.8
+                wrapMode: Text.Wrap
+                horizontalAlignment: Text.AlignHCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width - 20
+            }
         }
 
-        // Информация о загруженных файлах
-        Text {
+        Button {
+            width: filesGrid.width
             anchors.horizontalCenter: parent.horizontalCenter
-            text: root.videoFiles.length
-                  > 0 ? `Загружено ${root.videoFiles.length} видео файл(ов)` : "Файлы не загружены"
-            color: palette.text
-            font.pointSize: 12
-            opacity: 0.8
+            text: "Авто-история"
         }
 
-        // Сетка файлов с видео-превью
         Grid {
-            visible: root.videoFiles.length > 0
+            id: filesGrid
             anchors.horizontalCenter: parent.horizontalCenter
             columns: 3
-            spacing: 15
+            spacing: 8
 
             Repeater {
+                id: repeatRoot
                 model: root.videoFiles
 
-                delegate: Item {
+                delegate: Rectangle {
                     id: cardRoot
                     width: 200
-                    height: 125
+                    height: 135
+                    radius: 6
+                    color: palette.window
+                    border.width: 1
 
+                    property var gridRef
+                    property var rootRef
+
+                    MouseArea {
+                        anchors.fill: parent
+                        drag.target: parent
+
+                        drag.minimumX: 0
+                        drag.maximumX: cardRoot.gridRef.width - 200
+                        drag.minimumY: 0
+                        drag.maximumY: cardRoot.gridRef.y - 25
+
+                        onReleased: {
+                            var newPosInGridX = Math.round(
+                                        parent.x / (parent.width + cardRoot.gridRef.spacing))
+
+                            var newPosInGridY = Math.round(
+                                        parent.y / (parent.height + cardRoot.gridRef.spacing))
+
+                            // вычисляем координаты ближайшей ячейки
+                            var targetX = newPosInGridX * (parent.width + cardRoot.gridRef.spacing)
+                            var targetY = newPosInGridY * (parent.height + cardRoot.gridRef.spacing)
+
+                            var indexInGrid = newPosInGridY
+                                    * cardRoot.gridRef.columns + newPosInGridX
+
+                            var oldIndex = cardRoot.rootRef.videoFiles.index(
+                                        modelData)
+
+                            cardRoot.rootRef.videoFiles.move(indexInGrid,
+                                                             oldIndex, 1)
+
+                            // запускаем анимацию
+                            animateX.to = targetX
+                            animateY.to = targetY
+                            animateX.running = true
+                            animateY.running = true
+                        }
+                    }
+
+                    NumberAnimation {
+                        id: animateX
+                        target: cardRoot
+                        property: "x"
+                        duration: 200
+                        easing.type: Easing.OutQuad
+                    }
+                    NumberAnimation {
+                        id: animateY
+                        target: cardRoot
+                        property: "y"
+                        duration: 200
+                        easing.type: Easing.OutQuad
+                    }
+
+                    // содержимое карточки
                     Rectangle {
                         anchors.fill: parent
-                        border.width: 1.5
-                        border.color: palette.mid
-                        radius: 16
                         color: palette.dark
+                        radius: 12
+                        Column {
+                            anchors.fill: parent
+                            Item {
+                                height: 112
+                                width: 200
+                                VideoThumbnail {
+                                    anchors.fill: parent
+                                    anchors.margins: 1
+                                    source: modelData
+                                }
+                            }
+                            Text {
+                                height: 23
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                color: palette.text
+                                text: modelData.replace("file:///",
+                                                        "").split('/').pop()
+                                verticalAlignment: Text.AlignVCenter
+                                font.pointSize: 10
+                            }
+                        }
                     }
-
-                    VideoThumbnail {
-                        anchors.centerIn: parent
-                        anchors.fill: parent
-                        source: modelData
-                    }
-
-                    Text {
-                        anchors.centerIn: parent
-                        color: "white"
-                        text: modelData
+                }
+                Component.onCompleted: {
+                    for (var i = 0; i < repeatRoot.count; ++i) {
+                        var item = repeatRoot.itemAt(i)
+                        item.gridRef = filesGrid
+                        item.rootRef = root
                     }
                 }
             }
         }
 
-        Button {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: "Назад"
-            onClicked: root.navigationFunctions.popPage()
+        Item {
+            width: 1
+            height: 8
+        }
+
+        Row {
+            Button {
+                id: backButton
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Назад"
+                onClicked: root.navigationFunctions.popPage()
+            }
+            Button {
+                id: nextButton
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Назад"
+                onClicked: root.navigationFunctions.popPage()
+            }
         }
     }
 }
