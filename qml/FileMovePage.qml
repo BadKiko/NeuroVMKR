@@ -56,6 +56,8 @@ Page {
             anchors.horizontalCenter: parent.horizontalCenter
             columns: 3
             spacing: 8
+            videoFiles: root.videoFiles
+            onVideoMoved: videoFiles => root.videoFiles = videoFiles
         }
 
         Item {

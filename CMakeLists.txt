@@ -8,6 +8,16 @@ set(CMAKE_AUTORCC ON)
 # Подключаем Qt6 Quick и QuickControls2
 find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2 Multimedia)
 
+# FetchContent для загрузки библиотеки с GitHub
+include(FetchContent)
+
+FetchContent_Declare(
+  MistralCppLib
+  GIT_REPOSITORY https://github.com/BadKiko/MistralCpp.git
+  GIT_TAG 0.0.1
+)
+FetchContent_MakeAvailable(MistralCppLib)
+
 qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(appNeuroVMKR
@@ -40,7 +50,7 @@ set_target_properties(appNeuroVMKR PROPERTIES
 
 # Линкуем
 target_link_libraries(appNeuroVMKR
-    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Multimedia
+    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Multimedia MistralCppLib
 )
 
 include(GNUInstallDirs)

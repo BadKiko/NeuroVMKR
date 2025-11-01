@@ -4,17 +4,20 @@ Grid {
     id: filesGrid
     property int cellWidth: 200
     property int cellHeight: 135
+    property var videoFiles
+    signal videoMoved(var videoFiles)
+
     spacing: 10
     columns: Math.max(1, Math.floor(width / (cellWidth + spacing)))
 
     Repeater {
         id: repeatRoot
-        model: root.videoFiles
+        model: filesGrid.videoFiles
 
         delegate: Item {
             id: cardRoot
-
-            property VideoDragNDropGrid gridRef
+            property var gridRef: filesGrid
+            property var repeaterRef: repeatRoot
 
             width: gridRef.cellWidth
             height: gridRef.cellHeight
@@ -37,7 +40,6 @@ Grid {
             x: gridPos(displayIndex).x
             y: gridPos(displayIndex).y
 
-            // Индекс для отрисовки, не обязательно совпадает с реальным index
             property int displayIndex: index
 
             Behavior on x {
@@ -47,6 +49,7 @@ Grid {
                     easing.type: Easing.OutQuad
                 }
             }
+
             Behavior on y {
                 enabled: !cardRoot.isDragging
                 NumberAnimation {
@@ -93,33 +96,34 @@ Grid {
                     if (!cardRoot.isDragging)
                         return
 
-                    // Вычисляем предполагаемый индекс
+                    // вычисляем индекс наведения
                     const gridX = Math.max(
                                     0, Math.min(
                                         cardRoot.gridRef.columns - 1,
                                         Math.round(
                                             cardRoot.x / (cardRoot.gridRef.cellWidth
                                                           + cardRoot.gridRef.spacing))))
+
                     const gridY = Math.max(
                                     0, Math.min(
                                         Math.ceil(
-                                            repeatRoot.count / cardRoot.gridRef.columns) - 1,
+                                            cardRoot.repeaterRef.count
+                                            / cardRoot.gridRef.columns) - 1,
                                         Math.round(
                                             cardRoot.y / (cardRoot.gridRef.cellHeight
                                                           + cardRoot.gridRef.spacing))))
+
                     const hoverIndex = Math.max(
                                          0, Math.min(
-                                             repeatRoot.count - 1,
+                                             cardRoot.repeaterRef.count - 1,
                                              gridY * cardRoot.gridRef.columns + gridX))
 
                     if (hoverIndex !== cardRoot.hoverIndex) {
                         cardRoot.hoverIndex = hoverIndex
                         // визуальный свап
-                        for (var i = 0; i < repeatRoot.count; i++) {
-                            const item = repeatRoot.itemAt(i)
-                            if (!item)
-                                continue
-                            if (item === cardRoot)
+                        for (var i = 0; i < cardRoot.repeaterRef.count; i++) {
+                            const item = cardRoot.repeaterRef.itemAt(i)
+                            if (!item || item === cardRoot)
                                 continue
 
                             if (i > cardRoot.startIndex && i <= hoverIndex)
@@ -139,20 +143,22 @@ Grid {
 
                     const newIndex = cardRoot.hoverIndex
                     if (newIndex !== cardRoot.startIndex) {
-                        const arr = root.videoFiles.slice()
+                        const arr = cardRoot.gridRef.videoFiles.slice()
                         arr.splice(newIndex, 0,
                                    arr.splice(cardRoot.startIndex, 1)[0])
-                        root.videoFiles = arr
+                        cardRoot.gridRef.videoFiles = arr
                     }
 
                     // сброс временных индексов
-                    for (var i = 0; i < repeatRoot.count; i++) {
-                        const item = repeatRoot.itemAt(i)
+                    for (var i = 0; i < cardRoot.repeaterRef.count; i++) {
+                        const item = cardRoot.repeaterRef.itemAt(i)
                         if (item)
                             item.displayIndex = i
                     }
 
                     backAnimation.start()
+
+                    cardRoot.gridRef.videoMoved(cardRoot.gridRef.videoFiles)
                 }
 
                 onCanceled: {
@@ -221,13 +227,6 @@ Grid {
                 border.width: 2
                 color: "transparent"
                 visible: cardRoot.isDragging
-            }
-        }
-
-        Component.onCompleted: {
-            for (var i = 0; i < repeatRoot.count; ++i) {
-                var item = repeatRoot.itemAt(i)
-                item.gridRef = filesGrid
             }
         }
     }
